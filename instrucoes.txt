@@ -1,0 +1,21 @@
+RODAR EM OUTROS PCS
+
+1. Executar o Django em uma URL acessível
+    uvicorn main:app --host 0.0.0.0 --port 8000
+
+3. Liberar o firewall (se necessario):
+    netsh advfirewall firewall add rule name="FastAPI 8000" dir=in action=allow protocol=TCP localport=8000
+
+4. URL para outros pcs acessarem:
+    http://xxx.xxx.x.xx:8000/teams
+           ip do pc host
+
+
+ACESSAR API FORA DA REDE
+
+1. pip install pyngrok
+
+2. uvicorn main:app --host 0.0.0.0 --port 8000
+
+3. ngrok http 8000 (em outro terminal)
+    Um link sera gerado, utilizado como acesso para a API
