@@ -5,7 +5,10 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from typing import List, Optional
 from pydantic import BaseModel
 
-app = FastAPI()
+from models import Team
+from database import TeamDB, get_db
+
+app = FastAPI(description="")
 
 # Habilitando CORS para acesso aberto
 app.add_middleware(
@@ -15,46 +18,6 @@ app.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"],  
 )
-
-# Configuração do banco de dados SQLite
-DATABASE_URL = "sqlite:///./nba.db"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# Modelo SQLAlchemy (Banco de Dados)
-class TeamDB(Base):
-    __tablename__ = "teams"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    city = Column(String)
-    championships = Column(Integer)
-    founded = Column(Integer)
-    market_value = Column(Float)
-    conference_titles = Column(Integer)
-    conference = Column(String)
-
-# Criando a tabela no banco
-Base.metadata.create_all(bind=engine)
-
-# Modelo Pydantic para validação
-class Team(BaseModel):
-    id: int
-    name: str
-    city: str
-    championships: int
-    founded: int
-    market_value: float
-    conference_titles: int
-    conference: str
-
-# Dependência para obter sessão do banco
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # Rota para adicionar um time
 @app.post("/teams", response_model=Team)
@@ -144,6 +107,6 @@ def delete_team(team_id: int, db: Session = Depends(get_db)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", 
-                port=8000, log_level="info", 
+    uvicorn.run("main:app", host="127.0.0.1",  # host="10.234.91.223"
+                port=8080, log_level="info", 
                 reload=True)
